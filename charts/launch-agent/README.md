@@ -2,37 +2,29 @@
 
 This chart deploys the W&B Launch Agent to your Kubernetes cluster.
 
-If you have not added `wandb` as a helm repo, please run:
-
-```bash
-helm repo add wandb https://wandb.github.io/helm-charts
-```
-
 The launch agent is a Kubernetes Deployment that runs a container that connects to the W&B API and watches for new runs in one or more launch queues. When the agent pops a run off the queue(s), it will launch a Kubernetes Job to execute the run on the W&B user's behalf.
 
 To deploy an agent, you will need to specify the following values in [`values.yaml`](values.yaml):
 
 - `agent.apiKey`: Your W&B API key
-  - Note: `agent.useExternalWandbSecret` can be set to `true` if you would like to provide your api key external to this helm chart.
-- `launchConfig`: The literal contents of a launch agent config file that will be used to configure the agent. See the [launch agent docs](https://docs.wandb.ai/guides/launch/run-agent) for more information.
+- `launchConfig`: The agent launch config
 
-You will likely want to modify the variable `agent.resources.limits.{cpu,mem}`, which default to `1000m`, and `1Gi` respectively.
+## Example Launch Config
 
-By default, this chart will also install [volcano](https://volcano.sh)
+------------------------------
+W&B entity (i.e. user or team) name
+entity: <W_B_ENTITY>
 
-- `volcano`: Set to `false` to disable volcano install (default: `true`)
+Max number of concurrent runs to perform. -1 = no limit
+max_jobs: -1
 
-You can modify the values directly in the `values.yaml` file or provide them as command line arguments when running `helm install`, for example:
+List of queues to poll.
+queues:
+  - <QUEUE_NAME>
 
-```bash
-helm install <package-name> <launch-agent-chart-path> --set agent.apiKey=<your-api-key>
-```
-
-Here is an example with a `values.yaml`
-
-```bash
-helm upgrade --namespace=wandb --create-namespace --install wandb-launch wandb/launch-agent -f ./values.yaml
-```
+builder:
+  type: noop
+------------------------------
 
 ## Chart variables
 

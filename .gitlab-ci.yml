@@ -8,7 +8,7 @@ Helm lint:
     name: alpine/helm:3.3.1
     entrypoint: [""]
   script:
-    - cd helm/charts/determined
+    - cd charts/launch-agent
     - helm dep update
     - helm lint .
   needs: []
@@ -20,14 +20,14 @@ Helm push:
       - coreweave
     changes:
       - .gitlab-ci.yml
-      - helm/charts/determined/*
+      - charts/launch-agent/*
   image:
     name: alpine/helm:3.3.1
     entrypoint: [""]
   script:
     - apk add git
     - helm plugin install https://github.com/chartmuseum/helm-push.git
-    - cd helm/charts/determined
+    - cd charts/launch-agent
     - helm repo add helm_repo $HELM_REPO_URL --username $HELM_REPO_USER --password $HELM_REPO_PASS
     - helm dep update
     - helm cm-push . helm_repo

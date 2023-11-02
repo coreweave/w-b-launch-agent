@@ -12,26 +12,11 @@ agent:
       cpu: 4
       memory: 16Gi
 
-# Namespace to deploy launch agent into
-namespace: {{ .Release.Namespace }}
-
 # W&B api url (Set yours here)
 baseUrl: https://api.wandb.ai
 
 # This should be set to the literal contents of your launch agent config.
 launchConfig: |
-  # W&B entity (i.e. user or team) name
-  entity: rtalari-coreweave
-
-  # Max number of concurrent runs to perform. -1 = no limit
-  max_jobs: -1
-
-  # List of queues to poll.
-  queues:
-    - wb-cw-3
-  
-  builder:
-    type: noop
 
 # Set to false to disable volcano install.
 volcano: false
