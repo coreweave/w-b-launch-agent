@@ -1,0 +1,23 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "properties": {
+      "agent": {
+        "type": "object",
+        "form": "true",
+        "title": "W&B Launch Agent Configuration",
+        "required": [
+          "apiKey"
+        ],
+        "properties": {
+          "apiKey": {
+            "type": "string",
+            "form": "true", 
+            "title": "W&B API KEY",
+            "description": "Please enter your W&B API KEY"
+          }
+        }
+      }
+    },
+    "title": "Values",
+    "type": "object"
+  }
