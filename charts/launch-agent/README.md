@@ -9,40 +9,72 @@ To deploy an agent, you will need to specify the following values in [`values.ya
 - `agent.apiKey`: Your W&B API key
 - `launchConfig`: The agent launch config
 
+Please refer to the W&B Launch Docs: https://docs.wandb.ai/guides/launch for additional details for setup of the queue and configuration.
+
 ## Example Launch Config
 
-------------------------------
-W&B entity (i.e. user or team) name
-entity: <W_B_ENTITY>
+```
+  #W&B entity (i.e. user or team) name
+  entity: '<W_B_ENTITY>'
 
-Max number of concurrent runs to perform. -1 = no limit
-max_jobs: -1
+  #Max number of concurrent runs to perform. -1 = no limit
+  max_jobs: -1
 
-List of queues to poll.
-queues:
-  - <QUEUE_NAME>
+  #List of queues to poll.
+  queues:
+    - '<W_B_QUEUE>'
 
-builder:
-  type: noop
-------------------------------
+  builder:
+    type: noop
+```
 
-## Chart variables
 
-The table below describes all the available variables in the chart:
+## Example Queue Config for CoreWeave 
+# 1 A40 GPU, Region - LAS, 8 vCPUs, 128Gi Memory
 
-| Variable                       | Type            | Required             | Default                         | Description                                                                                                                                      |
-| ------------------------------ | --------------- | -------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `agent.labels`                 | object          | No                   | {}                              | Labels that will be added to the agent deployment.                                                                                               |
-| `agent.apiKey`                 | string          | **Yes**<sup>\*</sup> | ""                              | W&B API key to be used by the agent.                                                                                                             |
-| `agent.useExternalWandbSecret` | bool            | **false**            | ""                              | Used to indicate you want to provide the api key secret external to this chart.                                                                  |
-| `agent.image`                  | string          | No                   | `wandb/launch-agent-dev:latest` | Container image for the agent.                                                                                                                   |
-| `agent.imagePullPolicy`        | string          | No                   | `Always`                        | Pull policy for the agent container image.                                                                                                       |
-| `agent.resources`              | object          | No                   | Limit to 1 CPU, 1Gi RAM         | Pod spec resources block for the agent.                                                                                                          |
-| `namespace`                    | string          | No                   | `wandb`                         | The namespace to deploy the agent into.                                                                                                          |
-| `additionalTargetNamespaces`   | list(string)    | No                   | [`wandb`,`default`]             | A list of namespaces the agent can run jobs in.                                                                                                  |
-| `baseUrl`                      | string          | No                   | `https://api.wandb.ai`          | URL of your W&B server api.                                                                                                                      |
-| `launchConfig`                 | mutiline string | **Yes**              | `null`                          | his should be set to the literal contents of your launch agent config.                                                                           |
-| `volcano`                      | bool            | No                   | `true`                          | Controls whether the volcano scheduler should be installed in your cluster along with the agent. Set to `false` to disable volcano installation. |
-| `gitCreds`                     | mutiline string | No                   | `null`                          | Contents of a git credentials file.                                                                                                              |
-| `serviceAccount.annotations`   | object          | No                   | `null`                          | Annotations for the wandb service account.                                                                                                       |
-| `azureStorageAccessKey`        | string          | No                   | ""                              | Azure storage access key required for kaniko to acces build contexts in azure blob storage.                                                      |
+```
+metadata:
+  namespace: '<CW_NAMESPACE>'
+spec:
+  template:
+    spec:
+      containers:
+      - image: '<DOCKER_IMAGE>'
+        name: finetuner-llm
+        env:
+        - name: WANDB_API_KEY
+          value: '<W_B_API_KEY>'
+        resources:
+          requests:
+            memory: 128Gi
+            cpu: 8
+            nvidia.com/gpu: 1
+          limits:
+            memory: 128Gi
+            cpu: 8
+            nvidia.com/gpu: 1
+        volumeMounts:
+          - name: dshm
+            mountPath: /dev/shm
+
+      volumes:
+        - emptyDir:
+            medium: Memory
+          name: dshm
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: gpu.nvidia.com/class
+                    operator: In
+                    values:
+                      - "A40"
+                  - key: topology.kubernetes.io/region
+                    operator: In
+                    values:
+                      - LAS1
+      restartPolicy: Never
+  backoffLimit: 1
+```
+

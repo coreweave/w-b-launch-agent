@@ -1,3 +1,5 @@
 This chart launches the W&B launch agent. Please setup a queue with the appropriate configuration in W&B before deploying this chart.
 
 Specifically, the W&B API KEY and W&B Queue Name should be passed into the deployment for it to function correctly. 
+
+Please refer to the W&B Launch Docs: https://docs.wandb.ai/guides/launch
