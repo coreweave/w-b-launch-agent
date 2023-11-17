@@ -22,6 +22,15 @@ spec:
 {{- end }}
     spec:
       serviceAccountName: wandb-launch-serviceaccount
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: topology.kubernetes.io/region
+                operator: In
+                values:
+                - {{ .Values.region | upper }}
       containers:
         - name: launch-agent
           image: {{ .Values.agent.image }}

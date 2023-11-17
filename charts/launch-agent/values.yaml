@@ -8,9 +8,15 @@ agent:
   imagePullPolicy: Always
   # Resources block for the agent spec.
   resources:
+    requests:
+      cpu: 4
+      memory: 16Gi
     limits:
       cpu: 4
       memory: 16Gi
+
+# Region to launch in CW [ORD1, LAS1, LGA1]
+region: ORD1
 
 # W&B api url (Set yours here)
 baseUrl: https://api.wandb.ai

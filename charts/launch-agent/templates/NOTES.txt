@@ -1,5 +1,3 @@
-This chart launches the W&B launch agent. Please setup a queue with the appropriate configuration in W&B before deploying this chart.
-
+This chart launches the W&B Launch agent. Before deploying this chart, please , create a queue (https://docs.wandb.ai/guides/launch/setup-launch-kubernetes ) with the appropriate configuration in W&B. 
 Specifically, the W&B API KEY and W&B Queue Name should be passed into the deployment for it to function correctly. 
-
-Please refer to the W&B Launch Docs: https://docs.wandb.ai/guides/launch
+For more details, please refer to the W&B docs: https://docs.wandb.ai/guides/launch .
