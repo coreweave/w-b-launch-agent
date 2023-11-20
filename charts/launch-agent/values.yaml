@@ -2,32 +2,28 @@ agent:
   labels: {}
   # W&B API key.
   apiKey: ""
-  # Providing API key can be done external to this chart
-  useExternalWandbSecret: false
   # Container image to use for the agent.
-  image: wandb/launch-agent:latest
+  image: wandb/launch-agent-dev:latest
   # Image pull policy for agent image.
   imagePullPolicy: Always
   # Resources block for the agent spec.
   resources:
+    requests:
+      cpu: 4
+      memory: 16Gi
     limits:
-      cpu: 1000m
-      memory: 1Gi
+      cpu: 4
+      memory: 16Gi
   # Node selector for the agent pod.
   nodeSelector: {}
   # Job start timeout (seconds)
   startTimeout: 1800
 
-# Namespace to deploy launch agent into
-namespace: wandb
+# Region to launch in CW [ORD1, LAS1, LGA1]
+region: ORD1
 
 # W&B api url (Set yours here)
 baseUrl: https://api.wandb.ai
-
-# Additional target namespaces that the launch agent can deploy into
-additionalTargetNamespaces:
-  - default
-  - wandb
 
 # This should be set to the literal contents of your launch agent config.
 launchConfig: |
@@ -38,19 +34,4 @@ launchConfig: |
   builder:  # Builder config. Type `noop` and `kaniko` can be used in a kubernetes cluster.
     type: noop
 
-# Set to false to disable volcano install.
-volcano: true
 
-# The contents of a git credentials file. This will be stored in a k8s secret
-# and mounted into the agent container. Set this if you want to clone private
-# repos.
-gitCreds: |
-
-# Annotations for the wandb service account. Useful when setting up workload identity on gcp.
-serviceAccount:
-  annotations:
-    # iam.gke.io/gcp-service-account:
-    # azure.workload.identity/client-id:
-
-# Set to access key for azure storage if using kaniko with azure.
-azureStorageAccessKey: ""

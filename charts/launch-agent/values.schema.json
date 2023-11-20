@@ -1,0 +1,21 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "properties": {
+      "region": {
+        "type": "string",
+        "enum": [
+          "ORD1",
+          "LAS1",
+          "LGA1"
+        ],
+        "form": true,
+        "title": "Region",
+        "customComponent": {
+          "id": "region_selector",
+          "component": "RegionSelector"
+        }
+      }
+    },
+    "title": "Values",
+    "type": "object"
+  }

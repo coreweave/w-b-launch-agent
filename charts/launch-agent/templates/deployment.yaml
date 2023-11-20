@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: launch-agent
-  namespace: {{ .Values.namespace }}
+  namespace: {{ .Release.Namespace }}
   annotations:
     checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
 spec:
@@ -22,6 +22,15 @@ spec:
 {{- end }}
     spec:
       serviceAccountName: wandb-launch-serviceaccount
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: topology.kubernetes.io/region
+                operator: In
+                values:
+                - {{ .Values.region | upper }}
       containers:
         - name: launch-agent
           image: {{ .Values.agent.image }}
