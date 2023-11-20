@@ -24,6 +24,4 @@ baseUrl: https://api.wandb.ai
 # This should be set to the literal contents of your launch agent config.
 launchConfig: |
 
-# Set to false to disable volcano install.
-volcano: false
 
