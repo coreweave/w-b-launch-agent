@@ -77,5 +77,3 @@ spec:
       restartPolicy: Never
   backoffLimit: 1
 ```
-
-Once you've created the queue, try launching a job to it--either take an existing example job from this public W&B project https://wandb.ai/wandb/jobs/jobs , or register your own in this quick tutorial https://colab.research.google.com/drive/1wX0OSVxZJDHRsZaOaOEDx-lLUrO1hHgP#scrollTo=ADI8bXCXlJNn. 
