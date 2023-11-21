@@ -10,7 +10,11 @@ metadata:
 {{- end }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
+{{- if eq "user" .Values.scope }}
 kind: Role
+{{ else if eq "cluster" .Values.scope}}
+kind: ClusterRole
+{{ end }}
 metadata:
   namespace: {{ .Release.Namespace }}
   name: wandb-launch-agent
@@ -24,7 +28,11 @@ rules:
 ...
 ---
 apiVersion: rbac.authorization.k8s.io/v1
+{{- if eq "user" .Values.scope }}
 kind: Role
+{{ else if eq "cluster" .Values.scope}}
+kind: ClusterRole
+{{ end }}
 metadata:
   name: job-creator
 rules:

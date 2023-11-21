@@ -12,8 +12,18 @@ agent:
       cpu: 4
       memory: 16Gi
 
+# Annotations for Service Account
+serviceAccount:
+  annotations: {}
+
 # Region to launch in DataCenter Region [ORD1, LAS1, LGA1]
 region: ORD1
+
+#Scope of RBAC [user, cluster]
+scope: user
+
+# Affinity
+affinity: {}
 
 # W&B api url (Set yours here)
 baseUrl: https://api.wandb.ai

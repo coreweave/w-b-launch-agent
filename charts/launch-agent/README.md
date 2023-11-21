@@ -32,8 +32,6 @@ Please refer to the W&B Launch Docs: https://docs.wandb.ai/guides/launch for add
 ## Example Queue Config for CoreWeave 
 
 ```
-metadata:
-  namespace: '<CW_NAMESPACE>'
 spec:
   template:
     spec:
@@ -55,8 +53,9 @@ spec:
 
       volumes:
         - emptyDir:
-            medium: Memory
+            sizeLimit: 64Gi
           name: dshm
+
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
