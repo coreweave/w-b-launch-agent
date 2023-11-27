@@ -10,7 +10,7 @@ metadata:
 {{- end }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
+kind: {{ ternary "ClusterRole" "Role" (eq .Values.scope "cluster")}}
 metadata:
   namespace: {{ .Values.namespace }}
   name: wandb-launch-agent-{{ .Release.Name }}
@@ -24,7 +24,7 @@ rules:
 ...
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
+kind: {{ ternary "ClusterRole" "Role" (eq .Values.scope "cluster")}}
 metadata:
   name: wandb-job-creator-{{ .Release.Name }}
 rules:
@@ -34,9 +34,11 @@ rules:
   - apiGroups: ["batch"]
     resources: ["jobs", "jobs/status"]
     verbs: ["create", "get", "watch", "list", "update", "delete", "patch"]
+  {{- if .Values.volcano }}
   - apiGroups: ["batch.volcano.sh"]
     resources: ["jobs", "jobs/status"]
     verbs: ["create", "get", "watch", "list", "update", "delete", "patch"]
+  {{- end }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -56,6 +58,7 @@ roleRef:
 {{- $root := . -}}
 {{- $unique := uniq (append .Values.additionalTargetNamespaces .Values.namespace) }}
 {{- range $ns := $unique }}
+{{- if $ns }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -71,6 +74,7 @@ roleRef:
   name: wandb-job-creator-{{ $root.Release.Name }}
   apiGroup: rbac.authorization.k8s.io
 ...
+{{- end }}
 {{- end }}
 {{- end }}
 
