@@ -41,7 +41,7 @@ rules:
   {{- end }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+kind: {{ ternary "ClusterRoleBinding" "RoleBinding" (eq .Values.scope "cluster")}}
 metadata:
   name: wandb-launch-role-binding-{{ .Release.Name }}
   namespace: {{ .Values.namespace }}
@@ -50,7 +50,7 @@ subjects:
     name: wandb-launch-serviceaccount-{{ .Release.Name }}
     namespace: {{ .Values.namespace }}
 roleRef:
-  kind: Role
+  kind: {{ ternary "ClusterRole" "Role" (eq .Values.scope "cluster")}}
   name: wandb-launch-agent-{{ .Release.Name }}
   apiGroup: rbac.authorization.k8s.io
 ...
@@ -61,7 +61,7 @@ roleRef:
 {{- if $ns }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+kind: {{ ternary "ClusterRoleBinding" "RoleBinding" (eq .Values.scope "cluster")}}
 metadata:
   name: wandb-launch-cluster-role-binding-{{ $root.Release.Name }}
   namespace: {{ $ns }}
@@ -70,7 +70,7 @@ subjects:
     name: wandb-launch-serviceaccount-{{ $root.Release.Name }}
     namespace: {{ $root.Values.namespace }}
 roleRef:
-  kind: ClusterRole
+  kind: {{ ternary "ClusterRole" "Role" (eq .Values.scope "cluster")}}
   name: wandb-job-creator-{{ $root.Release.Name }}
   apiGroup: rbac.authorization.k8s.io
 ...
