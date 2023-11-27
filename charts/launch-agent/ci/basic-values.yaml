@@ -1,0 +1,26 @@
+agent:
+  apiKey: "<an-api-key>"
+  useExternalWandbSecret: false
+  image: wandb/launch-agent:latest
+  imagePullPolicy: Always
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+
+namespace: wandb
+
+additionalTargetNamespaces:
+  - default
+  - wandb
+
+launchConfig: |
+  queues: ["default"]
+
+volcano: true
+
+gitCreds: |
+
+serviceAccount:
+  annotations:
+    iam.gke.io/gcp-service-account:

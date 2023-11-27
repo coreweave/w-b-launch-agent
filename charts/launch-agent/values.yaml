@@ -19,8 +19,8 @@ serviceAccount:
 # Region to launch in DataCenter Region [ORD1, LAS1, LGA1]
 region: ORD1
 
-#Scope of RBAC [user, cluster]
-scope: user
+#Scope of RBAC [namespace, cluster]
+scope: namespace
 
 # Affinity
 affinity: {}
