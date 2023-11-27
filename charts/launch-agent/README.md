@@ -7,6 +7,7 @@ The launch agent is a Kubernetes Deployment that runs a container that connects 
 To deploy an agent, you will need to specify the following values in [`values.yaml`](values.yaml):
 
 - `agent.apiKey`: Your W&B API key
+  - Note: `agent.useExternalWandbSecret` can be set to `true` if you would like to provide your api key external to this helm chart.
 - `launchConfig`: The agent launch config
 
 Please refer to the W&B Launch Docs: https://docs.wandb.ai/guides/launch for additional details for setup of the queue and configuration.
@@ -73,7 +74,7 @@ spec:
   backoffLimit: 1
 ```
 
-Chart variables
+## Chart variables
 
 The table below describes all the available variables in the chart:
 
