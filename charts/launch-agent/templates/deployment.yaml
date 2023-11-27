@@ -22,8 +22,8 @@ spec:
 {{- end }}
     spec:
       serviceAccountName: wandb-launch-serviceaccount
-      {{- if .Values.affinity }}
-      {{- toYaml .Values.affinity | nindent 6 }}
+      {{- if .Values.agent.affinity }}
+      affinity: {{ toYaml .Values.agent.affinity | nindent 8 }}
       {{ else }}
       {{include "launchAgent.nodeAffinityAndTolerations" . | nindent 6 }}
       {{ end }}
