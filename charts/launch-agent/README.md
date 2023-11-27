@@ -96,6 +96,7 @@ The table below describes all the available variables in the chart:
 | `volcano`                      | bool            | No                   | `true`                          | Controls whether the volcano scheduler should be installed in your cluster along with the agent. Set to `false` to disable volcano installation. |
 | `gitCreds`                     | mutiline string | No                   | `null`                          | Contents of a git credentials file.                                                                                                              |
 | `serviceAccount.annotations`   | object          | No                   | `null`                          | Annotations for the wandb service account.                                                                                                       |
+| `azureStorageAccessKey`        | string          | No                   | ""                              | Azure storage access key required for kaniko to acces build contexts in azure blob storage.                                                      |
 
 - Note: `agent.useExternalWandbSecret` can be set to `true` if you would like to provide your api key external to this helm chart.
 - `launchConfig`: The literal contents of a launch agent config file that will be used to configure the agent. See the [launch agent docs](https://docs.wandb.ai/guides/launch/run-agent) for more information.
