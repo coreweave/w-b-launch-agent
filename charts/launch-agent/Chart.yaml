@@ -3,7 +3,7 @@ name: wandb-launch-agent-for-machine-learning
 icon: https://site.wandb.ai/wp-content/uploads/2023/11/Launch.png
 description: A Helm chart for running the W&B Launch Agent in Kubernetes
 type: application
-version: 0.11.6
+version: 0.11.61
 maintainers:
   - name: wandb
     email: support@wandb.com
