@@ -56,4 +56,3 @@ serviceAccount:
 
 # Set to access key for azure storage if using kaniko with azure.
 azureStorageAccessKey: ""
-

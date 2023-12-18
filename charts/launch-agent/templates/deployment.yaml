@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: launch-agent
+  name: launch-agent-{{ .Release.Name }}
   namespace: {{ default .Release.Namespace .Values.namespace }}
   annotations:
     checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
