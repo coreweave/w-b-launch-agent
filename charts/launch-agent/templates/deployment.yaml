@@ -6,6 +6,7 @@ metadata:
   namespace: {{ default .Release.Namespace .Values.namespace }}
   annotations:
     checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
 spec:
   replicas: 1
   strategy:
@@ -22,6 +23,19 @@ spec:
 {{- end }}
     spec:
       serviceAccountName: wandb-launch-serviceaccount-{{ .Release.Name }}
+      {{- if .Values.kanikoPvcName }}
+      initContainers:
+      - name: kaniko-volume-chown
+        image: {{ .Values.agent.image }}
+        command: ["sh", "-c"]
+        args:
+        - chown -R 1000:1000 /home/launch_agent/kaniko
+        securityContext:
+          runAsUser: 0
+        volumeMounts:
+          - name: kaniko-pvc
+            mountPath: /home/launch_agent/kaniko
+      {{- end }}
       containers:
         - name: launch-agent
           image: {{ .Values.agent.image }}
@@ -55,6 +69,37 @@ spec:
               value: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
             - name: WANDB_LAUNCH_START_TIMEOUT
               value: "{{ .Values.agent.startTimeout }}"
+            - name: WANDB_RELEASE_NAME
+              value: "{{ .Release.Name }}"
+            {{- if .Values.additionalEnvVars }}
+            {{- range .Values.additionalEnvVars }}
+            - name: {{ .name }}
+              value: {{ .value }}
+            {{- end }}
+            {{- end }}
+            {{- if .Values.additionalSecretEnvVars }}
+            {{- range .Values.additionalSecretEnvVars }}
+            - name: {{ .name }}
+              valueFrom:
+                secretKeyRef:
+                  name: launch-agent-secret-env-vars
+                  key: {{ .name }}
+            {{- end }}
+            {{- end }}
+            {{- if and .Values.customCABundle.configMap.name .Values.customCABundle.configMap.key }}
+            - name: REQUESTS_CA_BUNDLE
+              value: /usr/local/share/ca-certificates/custom-ca.crt
+            {{- end }}
+            {{- if .Values.kanikoPvcName }}
+            - name: WANDB_LAUNCH_KANIKO_PVC_NAME
+              value: {{ .Values.kanikoPvcName }}
+            - name: WANDB_LAUNCH_KANIKO_PVC_MOUNT_PATH
+              value: /home/launch_agent/kaniko
+            {{- end }}
+            {{- if .Values.kanikoDockerConfigSecret }}
+            - name: WANDB_LAUNCH_KANIKO_AUTH_SECRET
+              value: {{ .Values.kanikoDockerConfigSecret }}
+            {{- end }}
           volumeMounts:
             - name: wandb-launch-config
               mountPath: /home/launch_agent/.config/wandb
@@ -63,9 +108,16 @@ spec:
             - name: git-creds
               mountPath: /home/launch_agent/
               readOnly: true
-            - name: git-config
-              mountPath: /home/launch_agent/
+            {{ end }}
+            {{- if and .Values.customCABundle.configMap.name .Values.customCABundle.configMap.key }}
+            - name: custom-cabundle
+              mountPath: /usr/local/share/ca-certificates/custom-ca.crt
+              subPath: custom-ca.crt
               readOnly: true
+            {{ end }}
+            {{- if .Values.kanikoPvcName }}
+            - name: kaniko-pvc
+              mountPath: /home/launch_agent/kaniko
             {{ end }}
       volumes:
         - name: wandb-launch-config
@@ -79,6 +131,33 @@ spec:
           secret:
             secretName: git-config
         {{ end}}
+        {{- if and .Values.customCABundle.configMap.name .Values.customCABundle.configMap.key }}
+        - name: custom-cabundle
+          configMap:
+            name: {{ .Values.customCABundle.configMap.name }}
+            items:
+              - key: {{ .Values.customCABundle.configMap.key }}
+                path: custom-ca.crt
+        {{- end}}
+        {{ if .Values.kanikoPvcName }}
+        - name: kaniko-pvc
+          persistentVolumeClaim:
+            claimName: {{ .Values.kanikoPvcName }}
+        {{- end}}
       nodeSelector:
         {{- toYaml .Values.agent.nodeSelector | nindent 8 }}
-...
+      tolerations:
+        {{- toYaml .Values.agent.tolerations | nindent 8 }}
+---
+{{- if .Capabilities.APIVersions.Has "policy/v1" }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: launch-agent-{{ .Release.Name }}
+spec:
+  minAvailable: {{ .Values.agent.minAvailable }}
+  selector:
+    matchLabels:
+      app: launch-agent-{{ .Release.Name }}
+---
+{{- end }}
